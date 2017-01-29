@@ -27,9 +27,7 @@ public class ATM {
     }
 
     private void copy(int prev[], int next[]) {
-        for (int i = 0; i < Math.max(prev.length, next.length); i++) {
-            next[i] = prev[i];
-        }
+        System.arraycopy(prev, 0, next, 0, Math.max(prev.length, next.length));
     }
 
     public static void main(String[] args) throws IOException {
