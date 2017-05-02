@@ -3,7 +3,6 @@ import java.io.BufferedReader
 import java.io.File
 import java.io.FileReader
 import java.io.PrintWriter
-import java.lang.Long.parseLong
 import java.util.*
 
 fun main(args: Array<String>) {
@@ -13,7 +12,7 @@ fun main(args: Array<String>) {
     var st: StringTokenizer
     for (i in 0..t - 1) {
         st = StringTokenizer(reader.readLine())
-        val p = count(parseLong(st.nextToken()), st.nextToken().toLong())
+        val p = count(st.nextToken().toLong(), st.nextToken().toLong())
         writer.println("Case #" + (i + 1) + ": " + p.key + " " + p.value);
     }
     writer.close()
