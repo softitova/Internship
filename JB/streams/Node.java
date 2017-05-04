@@ -15,6 +15,7 @@ class Node {
     public String toString() {
         return stringView;
     }
+
     @Override
     public int hashCode() {
         return stringView.hashCode();
@@ -24,7 +25,8 @@ class Node {
         return t != null && this.hashCode() == t.hashCode();
     }
 
-    Node() {}
+    Node() {
+    }
 
     Node(String value) {
         if (value != null)
