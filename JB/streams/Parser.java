@@ -1,107 +1,136 @@
-package streams;
+package org.stepik.titova;
+
+import static org.stepik.titova.Parser.ops.*;
+import static org.stepik.titova.Utils.*;
 
 /**
- * Created by Sophia Titova on 30.04.17.
+ * Parses {@link String} and creates tree.
  */
-public class Parser extends Node {
+class Parser {
 
     private String expr;
     private int index;
 
-    Parser() {
-        expr = "";
-        index = 0;
+    /**
+     * Default constructor.
+     */
+    public Parser() {
+
     }
 
-    Parser(String expr, int index) {
-        this.expr = expr;
-        this.index = index;
-    }
-
-    private static void check(Node l, Node r, int index) throws ParseException {
-        if (l == null && r == null) {
-            throw new ParseException("Unexpected token, error since pos: " + (index + 1));
-
-        }
-    }
-
-    Node parse(String str) throws ParseException {
+    /**
+     * Parse given string and creates tree.
+     *
+     * @param str String to parse.
+     * @return {@link Node} of the root of syntax tree.
+     * @throws ParseException if it was error during parsing i.e. incorrect input.
+     */
+    public Node parse(String str) throws ParseException {
         index = 0;
         expr = str;
-        Node res = OR();
+        Node res = parseOr();
         if (index < expr.length()) {
-            throw new ParseException("Unexpected token since pos: " + (index + 1));
+            throw new ParseException("Unexpected token " + str.substring(index) + " since pos: " + index);
         }
         return res;
     }
 
     private void skipSpace() {
-        while (index < expr.length() && expr.charAt(index) == ' ') {
+        while (index < expr.length() && Character.isWhitespace(expr.charAt(index))) {
             index++;
         }
     }
 
-    private Node OR() throws ParseException {
-        Node l = AND();
-        skipSpace();
-        while (index < expr.length() - 1 && expr.substring(index, index + 2).equals(ops.OR.toString())) {
+    private Node parseOr() throws ParseException {
+        Node l = parseAnd();
+        while (index < expr.length() - 1 && OR.hasSuchName(expr.substring(index, index + 2))) {
             index += 2;
-            Node r = OR();
-            check(l, r, index);
-            l = new Node(ops.OR.toString(), l, r);
+            Node r = parseAnd();
+            l = new Node(OR, l, r);
         }
         return l;
     }
 
-    private Node AND() throws ParseException {
-        Node l = NOT();
-        skipSpace();
-        while (index < expr.length() - 2 && expr.substring(index, index + 3).equals(ops.AND.toString())) {
+    private Node parseAnd() throws ParseException {
+        Node l = parseNot();
+        while (index < expr.length() - 2 && AND.hasSuchName(expr.substring(index, index + 3))) {
             index += 3;
-            Node r = AND();
-            check(l, r, index);
-            l = new Node(ops.AND.toString(), l, r);
+            Node r = parseNot();
+            l = new Node(AND, l, r);
         }
         return l;
     }
 
-    private Node NOT() throws ParseException {
-
+    private Node parseNot() throws ParseException {
         Node curRoot;
         skipSpace();
-        if (index < expr.length() - 2 && expr.substring(index, index + 3).equals(ops.NOT.toString())) {
+        if (index == expr.length()) {
+            throw new ParseException("Incorrect input, on pos: " + index);
+        }
+        if (index < expr.length() - 2 && NOT.hasSuchName(expr.substring(index, index + 3))) {
             index += 3;
-            Node r = NOT();
-            if (r == null) {
-                throw new ParseException("Unexpected token, error since pos: " + (index + 1));
-            }
-            curRoot = new Node(ops.NOT.toString(), null, r);
+            Node r = parseNot();
+            curRoot = negate(r);
         } else if (expr.charAt(index) == '(') {
             index++;
-            curRoot = OR();
+            curRoot = parseOr();
+            if (expr.charAt(index - 1) == '(') {
+                throw new ParseException("Incorrect input, on pos: " + index + ", missing expression between ()");
+            }
             index++;
         } else {
-            int indexStart = index + 1;
-            StringBuilder val = new StringBuilder();
+            int indexStart = index;
             while (index < expr.length()
-                    && Character.isLetterOrDigit(expr.charAt(index))) {
-                val.append(expr.charAt(index));
+                    && Character.isLetter(expr.charAt(index))) {
                 index++;
             }
-            if (!val.toString().equals(lits.TRUE.toString())
-                    && !val.toString().equals(lits.FALSE.toString())
-                    && !val.toString().equals(val.toString().toLowerCase())) {
-                throw new ParseException("Incorrect identifier: " + val.toString()
-                        + " , error on pos: [" + indexStart + "..." + (index + 1) + "]");
-
+            String val = expr.substring(indexStart, index);
+            if (isLit(val)) {
+                curRoot = val.equals(lits.TRUE.toString()) ? TRUE_NODE : FALSE_NODE;
+            } else {
+                if (!val.equals(val.toLowerCase())) {
+                    throw new ParseException("Incorrect identifier: " + val
+                            + " , error on pos: [" + (indexStart) + ".." + (index) + "]");
+                }
+                curRoot = new Node(val);
             }
-            curRoot = new Node(val.toString());
         }
+        skipSpace();
         return curRoot;
     }
 
 
-    enum ops {NOT, AND, OR}
+    /**
+     * Supported operations.
+     */
+    enum ops {
+        NOT, AND, OR;
 
-    enum lits {TRUE, FALSE}
+        /**
+         * Checks if string view of element of {@link ops} is equals given {@link String}.
+         *
+         * @param other {@link String} to check.
+         * @return <code>true</code> if equals, <code>false</code> otherwise.
+         */
+        boolean hasSuchName(String other) {
+            return toString().equals(other);
+        }
+    }
+
+    /**
+     * Supported literals.
+     */
+    enum lits {
+        TRUE, FALSE;
+
+        /**
+         * Checks if string view of element of {@link lits} is equals given {@link String}.
+         *
+         * @param other {@link String} to check.
+         * @return <code>true</code> if equals, <code>false</code> otherwise.
+         */
+        boolean hasSuchName(String other) {
+            return toString().equals(other);
+        }
+    }
 }

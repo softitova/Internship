@@ -1,14 +1,27 @@
-package streams;
+package org.stepik.titova;
 
 /**
- * Created by Sophia Titova on 01.05.17.
+ * The class {@code ParseException} is a form of
+ * {@code Throwable}.
+ * <p>
+ * Need to handle exceptions during parsing.
+ * </p>
  */
 public class ParseException extends Exception {
-    String msg;
+    private String msg;
 
+    /**
+     * Default constructor.
+     */
     ParseException() {
+        super();
     }
 
+    /**
+     * Creates an instance of {@link #ParseException} with mistake message.
+     *
+     * @param msg {@link String} view of exception message.
+     */
     ParseException(String msg) {
         this.msg = msg;
     }

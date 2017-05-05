@@ -1,15 +1,57 @@
-package streams;
+package org.stepik.titova;
 
 /**
- * Created by Sophia Titova on 30.04.17.
+ * Parse tree node.
  */
-
-class Node {
+public class Node {
 
     String current = "";
     Node leftChild = null;
     Node rightChild = null;
-    String stringView = "";
+    private String stringView = "";
+
+    /**
+     * Creates an instance of Node where {@link #current} value is given {@link String}.
+     *
+     * @param value given value to {@link #current}.
+     */
+    Node(String value) {
+        if (value != null)
+            stringView = current = value;
+    }
+
+    /**
+     * Creates an instance of Node where {@link #current} value is given {@link String}.
+     * and given {@link Node} for {@link #rightChild} and  {@link #rightChild}.
+     *
+     * @param value given value to {@link #current}.
+     * @param l     given {@link Node} for {@link #leftChild}.
+     * @param r     given {@link Node} for {@link #rightChild}.
+     */
+    Node(String value, Node l, Node r) {
+        current = value;
+        leftChild = l;
+        rightChild = r;
+        if (leftChild != null) {
+            stringView += Utils.needParenthethis(this, leftChild) + " ";
+        }
+        stringView += current;
+        if (rightChild != null) {
+            stringView += " " + Utils.needParenthethis(this, rightChild);
+        }
+    }
+
+    /**
+     * Creates an instance of Node where {@link #current} value is received from {@link Parser.ops}.
+     * and given {@link Node} for {@link #rightChild} and  {@link #rightChild}.
+     *
+     * @param op given from {@link Parser.ops} value to {@link #current}.
+     * @param l  given {@link Node} for {@link #leftChild}.
+     * @param r  given {@link Node} for {@link #rightChild}.
+     */
+    Node(Parser.ops op, Node l, Node r) {
+        this(op.toString(), l, r);
+    }
 
     @Override
     public String toString() {
@@ -21,27 +63,12 @@ class Node {
         return stringView.hashCode();
     }
 
-    public boolean equals(Node t) {
-        return t != null && this.hashCode() == t.hashCode();
-    }
-
-    Node() {
-    }
-
-    Node(String value) {
-        if (value != null)
-            stringView = current = value;
-    }
-
-    Node(String value, Node l, Node r) {
-        current = value;
-        leftChild = l;
-        rightChild = r;
-        if (leftChild != null)
-            stringView += "(" + leftChild.toString() + ")";
-        stringView += current;
-        if (rightChild != null)
-            stringView += "(" + rightChild.toString() + ")";
+    @Override
+    public boolean equals(Object t) {
+        if (t == null || !(t instanceof Node)) {
+            return false;
+        }
+        return this.hashCode() == t.hashCode() && t.toString().equals(toString());
     }
 
 }
