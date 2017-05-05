@@ -3,11 +3,11 @@ package org.stepik.titova;
 /**
  * Parse tree node.
  */
-public class Node {
+class Node implements Comparable<Node> {
 
-    String current = "";
-    Node leftChild = null;
-    Node rightChild = null;
+    private String current = "";
+    private Node leftChild = null;
+    private Node rightChild = null;
     private String stringView = "";
 
     /**
@@ -32,6 +32,7 @@ public class Node {
         current = value;
         leftChild = l;
         rightChild = r;
+
         if (leftChild != null) {
             stringView += Utils.needParenthethis(this, leftChild) + " ";
         }
@@ -40,7 +41,6 @@ public class Node {
             stringView += " " + Utils.needParenthethis(this, rightChild);
         }
     }
-
     /**
      * Creates an instance of Node where {@link #current} value is received from {@link Parser.ops}.
      * and given {@link Node} for {@link #rightChild} and  {@link #rightChild}.
@@ -51,6 +51,27 @@ public class Node {
      */
     Node(Parser.ops op, Node l, Node r) {
         this(op.toString(), l, r);
+    }
+
+    /**
+     * @return current value of <code>Node</code>.
+     */
+    String getCurrent() {
+        return current;
+    }
+
+    /**
+     * @return left child of <code>Node</code>.
+     */
+    Node getLeftChild() {
+        return leftChild;
+    }
+
+    /**
+     * @return right child of <code>Node</code>.
+     */
+    Node getRightChild() {
+        return rightChild;
     }
 
     @Override
@@ -71,4 +92,8 @@ public class Node {
         return this.hashCode() == t.hashCode() && t.toString().equals(toString());
     }
 
+    @Override
+    public int compareTo(Node node) {
+        return toString().compareTo(node.toString());
+    }
 }

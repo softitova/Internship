@@ -1,5 +1,7 @@
 package org.stepik.titova;
 
+import static org.stepik.titova.Parser.lits.FALSE;
+import static org.stepik.titova.Parser.lits.TRUE;
 import static org.stepik.titova.Parser.ops.*;
 import static org.stepik.titova.Utils.*;
 
@@ -74,26 +76,29 @@ class Parser {
         } else if (expr.charAt(index) == '(') {
             index++;
             curRoot = parseOr();
-            if (expr.charAt(index - 1) == '(') {
-                throw new ParseException("Incorrect input, on pos: " + index + ", missing expression between ()");
+            if (index >= expr.length() || expr.charAt(index) != ')') {
+                throw new ParseException("Incorrect input, on pos: " + index + ", missing closing parenthethis");
             }
+
             index++;
+        } else if (expr.substring(index).startsWith(TRUE.toString())) {
+            index += TRUE.toString().length();
+            curRoot = TRUE_NODE;
+        } else if (expr.substring(index).startsWith(FALSE.toString())) {
+            index += FALSE.toString().length();
+            curRoot = FALSE_NODE;
         } else {
             int indexStart = index;
             while (index < expr.length()
-                    && Character.isLetter(expr.charAt(index))) {
+                    && Character.isLowerCase(expr.charAt(index))) {
                 index++;
             }
             String val = expr.substring(indexStart, index);
-            if (isLit(val)) {
-                curRoot = val.equals(lits.TRUE.toString()) ? TRUE_NODE : FALSE_NODE;
-            } else {
-                if (!val.equals(val.toLowerCase())) {
-                    throw new ParseException("Incorrect identifier: " + val
-                            + " , error on pos: [" + (indexStart) + ".." + (index) + "]");
-                }
-                curRoot = new Node(val);
+            if (val.isEmpty()) {
+                throw new ParseException("Incorrect identifier: " + val
+                        + " , error on pos: [" + (indexStart) + ".." + (index) + "]");
             }
+            curRoot = new Node(val);
         }
         skipSpace();
         return curRoot;

@@ -21,18 +21,20 @@ class Utils {
     /**
      * Places brackets during printing {@link Node}.
      *
-     * @param cur   current {@link Node}.
+     * @param cur   getCurrent() {@link Node}.
      * @param child child {@link Node}.
      * @return {@link String} view of child {@link Node}.
      */
     static String needParenthethis(Node cur, Node child) {
-        if (OR.hasSuchName(cur.current) && AND.hasSuchName(child.current)) {
+        String curStr = cur.getCurrent();
+        String childStr = child.getCurrent();
+        if (OR.hasSuchName(curStr) && AND.hasSuchName(childStr)) {
             return child.toString();
         }
-        if (cur.current.equals(child.current) || !isBinaryOp(child.current)) {
+        if (curStr.equals(childStr) || !isBinaryOp(childStr)) {
             return child.toString();
         }
-        if (cur.current.equals(NOT.toString()) && !isBinaryOp(child.current)) {
+        if (curStr.equals(NOT.toString()) && !isBinaryOp(childStr)) {
             return child.toString();
         }
         return "(" + child.toString() + ")";

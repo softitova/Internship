@@ -24,7 +24,6 @@ public class Main {
 
     private void run() throws FileNotFoundException {
         Scanner in = new Scanner(new InputStreamReader(System.in));
-//        Scanner in = new Scanner(new InputStreamReader(new FileInputStream("input.txt")));
         Parser parser = new Parser();
         int i = 0;
         while (true) {
@@ -40,7 +39,10 @@ public class Main {
 
     private void execute(Parser parser, String str) {
         try {
-            System.out.println(Simplifier.simplify(parser.parse(str)));
+
+            Node simplified = Simplifier.simplify(parser.parse(str));
+            System.out.println("assertTrue(check(\"" + simplified + "\", \"" + str + "\"));");
+//            System.out.println(simplified);
         } catch (ParseException e) {
             System.out.println(e.getMessage());
         }

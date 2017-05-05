@@ -30,7 +30,7 @@ public class Simplifier {
     }
 
     private static Pair<Node, Set<Node>> recSimple(Node node) {
-        switch (node.current) {
+        switch (node.getCurrent()) {
             case "OR":
                 return helper(node, TRUE_NODE, FALSE_NODE);
             case "AND":
@@ -44,17 +44,17 @@ public class Simplifier {
 
     private static Pair<Node, Set<Node>> helper(Node node, Node first, Node second) {
         Set<Node> simplifiedData = new HashSet<>();
-        String op = node.current;
+        String op = node.getCurrent();
         Queue<Node> queue = new LinkedList<>();
         queue.add(node);
         while (!queue.isEmpty()) {
             Node q = queue.poll();
-            if (!q.current.equals(op)) {
+            if (!q.getCurrent().equals(op)) {
                 q = recSimple(q).getKey();
             }
-            if (q.current.equals(op)) {
-                queue.add(q.leftChild);
-                queue.add(q.rightChild);
+            if (q.getCurrent().equals(op)) {
+                queue.add(q.getLeftChild());
+                queue.add(q.getRightChild());
             } else {
                 if (q.equals(first)) {
                     return pack(first);
@@ -65,7 +65,10 @@ public class Simplifier {
         }
         if (itemWithNegation(simplifiedData))
             return pack(first);
-        return new Pair<>(simplifiedData.stream().reduce((x, y) -> new Node(op, x, y)).orElse(second), simplifiedData);
+        return new Pair<>(simplifiedData.stream()
+                .sorted()
+                .reduce((x, y) -> new Node(op, x, y))
+                .orElse(second), simplifiedData);
     }
 
     private static boolean itemWithNegation(Set<Node> data) {
@@ -74,11 +77,11 @@ public class Simplifier {
 
     // NOT
     private static Pair<Node, Set<Node>> helper(Node node) {
-        Node child = node.rightChild;
-        if (isBinaryOp(child.current)) {
-            Node ll = negate(child.leftChild);
-            Node rr = negate(child.rightChild);
-            String op = OR.hasSuchName(child.current) ?
+        Node child = node.getRightChild();
+        if (isBinaryOp(child.getCurrent())) {
+            Node ll = negate(child.getLeftChild());
+            Node rr = negate(child.getRightChild());
+            String op = OR.hasSuchName(child.getCurrent()) ?
                     AND.toString() : OR.toString();
 
             return recSimple(new Node(op, ll, rr));
@@ -88,8 +91,8 @@ public class Simplifier {
             return pack(FALSE_NODE);
         } else if (child.equals(FALSE_NODE)) {
             return pack(TRUE_NODE);
-        } else if (NOT.hasSuchName(child.current)) {
-            return pack(child.rightChild);
+        } else if (NOT.hasSuchName(child.getCurrent())) {
+            return pack(child.getRightChild());
         }
         return pack(node);
     }
