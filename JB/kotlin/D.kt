@@ -84,6 +84,29 @@ private fun solve(st: StringTokenizer) {
     print_ans(ans1, ans2, need_plus_line, need_x_diag, n, changed)
 }
 
+private fun lines(need_plus_line: Array<BooleanArray>, n: Int, changed: Array<BooleanArray>) {
+    var res = n
+    val r = BooleanArray(n)
+    val c = BooleanArray(n)
+    (0..n - 1).forEach { i ->
+        (0..n - 1).forEach { j ->
+            if (need_plus_line[i][j]) {
+                r[i] = true
+                c[j] = true
+                res--
+            }
+        }
+    }
+    var row = 0
+    var col = 0
+    for (i in 0..res - 1) {
+        while (r[row]) row++
+        while (c[col]) col++
+        need_plus_line[row][col] = true
+        changed[row++][col++] = true
+    }
+}
+
 private fun diagonals(need_x_diag: Array<BooleanArray>, n: Int) {
     val dl = BooleanArray(nn)
     val dr = BooleanArray(nn)
@@ -103,33 +126,6 @@ private fun diagonals(need_x_diag: Array<BooleanArray>, n: Int) {
                 no_need_x_diags!![i1][j1] = true
             }
         }
-    }
-}
-
-private fun lines(need_plus_line: Array<BooleanArray>, n: Int, changed: Array<BooleanArray>) {
-    var res = n
-    val r = BooleanArray(n)
-    val c = BooleanArray(n)
-    (0..n - 1).forEach { i ->
-        (0..n - 1).forEach { j ->
-            if (need_plus_line[i][j]) {
-                r[i] = true
-                c[j] = true
-                res--
-            }
-        }
-    }
-    var row = 0
-    var col = 0
-    for (i in 0..res - 1) {
-        while (r[row]) {
-            row++
-        }
-        while (c[col]) {
-            col++
-        }
-        need_plus_line[row][col] = true
-        changed[row++][col++] = true
     }
 }
 
